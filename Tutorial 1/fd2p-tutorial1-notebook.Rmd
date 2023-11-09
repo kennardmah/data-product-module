@@ -1,0 +1,234 @@
+---
+title: "DESE71006 Tutorial 1: Intro to R Shiny"
+author: "Pierre Pinson"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook for the Tutorial 1 of the course "From Data to Product". When you execute code within the notebook, the results appear beneath the code. 
+
+# Activity 1: Making some simple plots in R... and monthly weather data at Heathrow
+
+## Step 1
+
+Let us first see what the function does (the help page will open in R Studio though):
+
+```{r read csv}
+?read.csv
+```
+
+We start by loading the data directly from the url provided:
+
+```{r load data}
+WeatherData <- read.csv("http://pierrepinson.com/wp-content/uploads/2023/10/Heathrow-weather-data-1948-2022.csv", header=TRUE)
+```
+
+## Step 2
+
+You can then visualise the raw data:
+
+```{r see data}
+WeatherData
+```
+
+It is also possible to the check the dimensions of that matrix:
+
+```{r dim data}
+dim(WeatherData)
+```
+
+And, get a summary of the contents and characteristics/statistics of the variables:
+
+```{r summary data}
+summary(WeatherData)
+```
+Since we have variables for each column, we can then specifically look at a specific variable:
+
+```{r extract variable}
+WeatherData$tmin
+```
+
+## Step 3
+
+Let us try with a simple plot for the minimum temperature:
+
+```{r first plot}
+plot(WeatherData$tmin)
+```
+
+We can see quite many issues here. Firstly, we may want to see a line between the points, and not just a bunch of bubbles. Also, the axes are not optimal: we would need the ticks to be more informative (for the x-axis, at least), and also the variable names.
+
+## Step 4
+
+Let us try with a simple plot for the minimum temperature:
+
+```{r line plot}
+plot(WeatherData$tmin, type="l", col="blue", xlab="months [starting from 1.1948]", ylab="degrees [Celsius]" )
+```
+
+## Step 5
+
+We now work on removing the axes and adding them in a more personalised way:
+
+```{r personalised plot}
+plot(WeatherData$tmin, type="l", col="blue", ylim=c(-5,20), xlab="years", ylab="degrees [Celsius]", axes=FALSE)
+axis(1, c(seq(1,length(WeatherData$tmin),20*12),length(WeatherData$tmin)), c(seq(1948,2008,20), 2022))
+axis(2, seq(-5,20,5))
+```
+
+## Step 6
+
+Let us follow the steps described in the tutorial document, and produce a plot for that climatology:
+
+```{r compute climatology tmin}
+tmin.vect <- WeatherData$tmin 
+dim(tmin.vect) <- c(12, length(tmin.vect)/12) 
+tmin.mean <- rowMeans(tmin.vect) 
+plot(tmin.mean, type="l", col="blue", ylim=c(0,15), xlab="months", ylab="degrees [Celsius]", axes=FALSE)
+axis(1, seq(1,12,1))
+axis(2, seq(0,15,5))
+```
+
+## Step 7
+
+We should extend what we did before to also consider the maximum temperature variable:
+
+```{r compute climatology tmin tmax plot}
+tmin.vect <- WeatherData$tmin 
+dim(tmin.vect) <- c(12, length(tmin.vect)/12)
+tmin.mean <- rowMeans(tmin.vect) 
+tmax.vect <- WeatherData$tmax 
+dim(tmax.vect) <- c(12, length(tmax.vect)/12) 
+tmax.mean <- rowMeans(tmax.vect) 
+plot(tmin.mean, type="l", col="blue", ylim=c(0,25), xlab="months", ylab="degrees [Celsius]", axes=FALSE)
+axis(1, seq(1,12,1))
+axis(2, seq(0,25,5))
+par(new=TRUE)
+plot(tmax.mean, type="l", col="red", ylim=c(0,25), xlab="", ylab="", axes=FALSE)
+legend(1,25, c("min T", "max T"), lty=c(1,1), col=c("blue", "red"))
+```
+
+
+## Step 8
+
+Same as before, but with the extra few lines to get the plots exported as a png file:
+
+```{r compute climatology tmin tmax plot png save}
+tmin.vect <- WeatherData$tmin # extract the variable of interest
+dim(tmin.vect) <- c(12, length(tmin.vect)/12) # transform the vector into a matrix
+tmin.mean <- rowMeans(tmin.vect) # calculate the mean per row
+tmax.vect <- WeatherData$tmax # extract the variable of interest
+dim(tmax.vect) <- c(12, length(tmax.vect)/12) # transform the vector into a matrix
+tmax.mean <- rowMeans(tmax.vect) # calculate the mean per row
+
+png("Heathrow-T-climatology.png", width=600, height=450, pointsize=12)
+plot(tmin.mean, type="l", col="blue", ylim=c(0,25), xlab="months", ylab="degrees [Celsius]", axes=FALSE)
+axis(1, seq(1,12,1))
+axis(2, seq(0,25,5))
+par(new=TRUE)
+plot(tmax.mean, type="l", col="red", ylim=c(0,25), xlab="", ylab="", axes=FALSE)
+legend(1,25, c("min T", "max T"), lty=c(1,1), col=c("blue", "red"))
+dev.off()
+```
+
+# Activity 2: Mastering R Shiny - 
+
+# Your first Shiny app
+
+## Exercise 1
+
+Remember that for a basic Shiny, you have to use a basic skeleton (as for the "hello world" app from Section 1.1):
+
+```{r hello world}
+library(shiny)
+ui <- fluidPage(
+  "Hello, world!"
+)
+server <- function(input, output, session) {
+}
+shinyApp(ui, server)
+```
+
+Then, we can simply use some of the material from this exercise to populate both UI and server blocks. Since we cannot have a Shiny app in a notebook/markdown like this one, please have a look at the file "app-exercise-1-1.R". Remember that the exercise is only about greeting the user by name!
+
+## Exercise 2
+
+We have to find the mistake in the code. Based on what you learn from this first Shiny app chapter, we know that there are 2 data frames, input and output, that are being handled by the UI and the server blocks. Hence, if we want to refer to the variables x it has to be as input$x. 
+
+You can find the resulting piece of code for the app in the file "app-exercise-1-2.R"
+
+## Exercise 3
+
+Instead of having a single slider for x, and a single variable x in input, we should do the same for y (hence, have 2 sliders, 1 for x and 1 for y, while also using y as one of the variables in input).
+
+You can find the resulting piece of code for the app in the file "app-exercise-1-3.R"
+
+## Exercise 4
+
+What is new is the fact that now, we have several outputs. In the way the code is written, the input variables (x and y) are called every time a different output is to be produced. To make it more reactive, we can simply "declare" these 2 variables in the server block, and then use them to produce the various outputs. Reactive expressions will be explored more thoroughly next week!
+
+You can find the resulting piece of code for the app in the file "app-exercise-1-4.R"
+
+## Exercise 5
+
+The 3 bugs are
+- in the UI block, tableOuput should be plotOutput (since one aims to prouce a plot there)
+- in the server block, output\$summmry should be output\$summary
+- in the server block, dataset should have parentheses... so plot(dataset) should be plot(dataset())
+
+You can find the resulting piece of code for the app in the file "app-exercise-1-5.R"
+
+# Basic UI (Exercises from Section 2.2 - Inputs)
+
+## Exercise 1
+
+To do that, when using the textInput command within the UI block, one should have value="" and then placeholder="Your name".
+
+You can find the resulting piece of code for the app in the file "app-exercise-2-2-1.R"
+
+## Exercise 2
+
+This one is a bit tricky since one also needs to know how to generate dates with R. This is done with as.Date("2020-09-16","%Y-%m-%d") for instance.
+
+You can find the resulting piece of code for the app in the file "app-exercise-2-2-2.R"
+
+## Exercise 3
+
+You should always look at the help (/documentation) page for the various R and Shiny commands you want to use. Here, for instance, this can be done by typing ?sliderInput in the console. There, could can see the entry "step" that allows you to specify a step of 5, and an entry "animate" that you can set to TRUE.
+
+You can find the resulting piece of code for the app in the file "app-exercise-2-2-3.R"
+
+## Exercise 4
+
+Let us look at the help (/documentation) page for selectInput, by typing ?selectInput in the console. There, it tells us that we can use lists to have a grouping and hierarchy of potential inputs.
+
+An example is provided with the app in the file "app-exercise-2-2-4.R"
+
+# Basic UI (Exercises from Section 2.3 - Outputs)
+
+## Exercise 1
+
+Following the explanations given in Section 2.3.1, in the server block, we should use "renderText" when it has to look like normal text, and "renderPrint" when it is code output. And, equivalently in the UI block, we should use "textOutput" when rendering normal text and "verbatimTextOutput" when rendering code output.
+
+Here this means that we should use:
+- verbatimTextOutput for renderPrint(summary(mtcars))
+- textOutput for renderText("Good morning!")
+- verbatimTextOutput for renderPrint(t.test(1:5, 2:6))
+- textOutput for renderText(str(lm(mpg ~ wt, data = mtcars)))
+
+## Exercise 2
+
+There is an alt option for the renderPlot command allowing to add alt text.
+
+You can find the resulting piece of code for the app in the file "app-exercise-2-3-2.R"
+
+## Exercise 3 and Exercise 4
+
+These exercises are less interesting... let's skip them for now!
+
+
