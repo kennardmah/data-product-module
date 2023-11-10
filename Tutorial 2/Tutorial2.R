@@ -1,14 +1,14 @@
 # # install packages if haven't done yet
-install.packages("tidyverse")
-install.packages("lubridate")
-install.packages("janitor")
-install.packages("rvest")
-install.packages("httr")
-install.packages("polite")
-install.packages("treemap")
-install.packages("d3treeR")
-devtools::install_github("jeromefroe/circlepackeR")
-install.packages("data.tree")
+# install.packages("tidyverse")
+# install.packages("lubridate")
+# install.packages("janitor")
+# install.packages("rvest")
+# install.packages("httr")
+# install.packages("polite")
+# install.packages("treemap")
+# install.packages("d3treeR")
+# devtools::install_github("jeromefroe/circlepackeR")
+# install.packages("data.tree")
 
 # To clean data
 library(tidyverse)
@@ -45,7 +45,7 @@ mydata <- ind_tab # store in dataframe ('mydata')
 mydata$total_population <- as.numeric(gsub(",", "", mydata$total_population)) # converting to numeric
 mydata$region[15] <- mydata$region[10] # small adjustment
 
-# 
+#
 # create a treemap w groups/subgroups
 #
 
@@ -62,7 +62,7 @@ p <- treemap(data,
              palette = "Set2",
              # bg.labels=c("white"),
              align.labels=list(
-               c("center", "center"), 
+               c("center", "center"),
                c("right", "bottom")
              )
 )
@@ -73,11 +73,10 @@ p <- treemap(data,
 # Create circular packaging chart
 #
 
-# devtools::install_github("jeromefroe/circlepackeR") # If needed
 
 # create a nested data frame giving the info of a nested dataset:
 data <- data.frame(
-  group, 
+  group,
   subgroup,
   value
 )
